@@ -8,6 +8,8 @@ body {
 
 .grid-cell {
     transition: all 0.2s;
+    width: 30px; /* Adjusted size for aesthetic */
+    height: 30px; /* Adjusted size for aesthetic */
 }
 
 .grid-cell.active {

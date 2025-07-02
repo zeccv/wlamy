@@ -1,6 +1,6 @@
 // Game variables
 let score = 0;
-let timeLeft = 60;
+let timeLeft = 30; // Each level lasts 30 seconds
 let level = 1;
 let gameActive = false;
 let timer;
@@ -11,11 +11,10 @@ const introScreen = document.getElementById('intro-screen');
 const gameScreen = document.getElementById('game-screen');
 const startBtn = document.getElementById('start-btn');
 const restartBtn = document.getElementById('restart-btn');
-const timeDisplay = document.getElementById('time');
-const scoreDisplay = document.getElementById('score');
 const levelDisplay = document.getElementById('level');
 const messageDisplay = document.getElementById('message');
 const gridContainer = document.getElementById('grid-container');
+const timeBar = document.getElementById('time-bar');
 
 // Game start
 startBtn.addEventListener('click', startGame);
@@ -24,16 +23,15 @@ restartBtn.addEventListener('click', startGame);
 function startGame() {
     // Reset game state
     score = 0;
-    timeLeft = 60;
+    timeLeft = 30; // Reset time for new level
     level = 1;
     gameActive = true;
     activeCells = [];
     
     // Update displays
-    scoreDisplay.textContent = score;
-    timeDisplay.textContent = timeLeft;
     levelDisplay.textContent = level;
     messageDisplay.textContent = '';
+    timeBar.style.width = '100%'; // Reset time bar
     
     // Switch screens
     introScreen.classList.add('hidden');
@@ -43,7 +41,7 @@ function startGame() {
     // Start timer
     timer = setInterval(() => {
         timeLeft--;
-        timeDisplay.textContent = timeLeft;
+        timeBar.style.width = (timeLeft / 30) * 100 + '%'; // Update time bar
         
         if (timeLeft <= 0) {
             endGame();
@@ -58,15 +56,11 @@ function generateCells() {
     // Clear grid
     gridContainer.innerHTML = '';
     
-    // Size depends on level
-    const gridSize = 4 + Math.floor(level / 2);
-    const gridArea = gridSize * gridSize;
-    
     // Create cells
     const cells = [];
-    for (let i = 0; i < gridArea; i++) {
+    for (let i = 0; i < 24 * 24; i++) { // 24x24 grid
         const cell = document.createElement('div');
-        cell.className = 'grid-cell bg-black border border-green-800 aspect-square flex items-center justify-center cursor-pointer';
+        cell.className = 'grid-cell bg-black border border-green-800 flex items-center justify-center cursor-pointer';
         cell.dataset.active = 'false';
         
         cell.addEventListener('click', () => {
@@ -79,15 +73,9 @@ function generateCells() {
             
             // Update score
             score += level;
-            scoreDisplay.textContent = score;
             
             // Remove from active cells
             activeCells = activeCells.filter(c => c !== cell);
-            
-            // Check if all cells clicked
-            if (activeCells.length === 0) {
-                levelUp();
-            }
         });
         
         gridContainer.appendChild(cell);
@@ -111,26 +99,15 @@ function generateCells() {
                     cell.dataset.active = 'false';
                     cell.classList.remove('active');
                     cell.classList.add('bg-red-900');
-                    endGame(); // End game if not clicked
                 }
-            }, 2000); // Time before cell disappears
+            }, 3000); // Increased time before cell disappears
         }
     }
     
     // Set timeout for next cell generation
     setTimeout(() => {
         if (gameActive) generateCells();
-    }, 1500); // Delay before generating next cell
-}
-
-function levelUp() {
-    level++;
-    levelDisplay.textContent = level;
-    messageDisplay.textContent = `Poziom ${level}!`;
-    
-    setTimeout(() => {
-        if (gameActive) generateCells();
-    }, 1000);
+    }, 3000); // Increased delay before generating next cell
 }
 
 function endGame() {
